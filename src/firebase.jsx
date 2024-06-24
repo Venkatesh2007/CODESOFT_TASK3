@@ -1,17 +1,16 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider,GithubAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, GithubAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-
 const firebaseConfig = {
-    apiKey: "AIzaSyBCP8Pd6hWuZPGMq5wJSEL01mLyvrTs-f4",
-    authDomain: "badam-blog.firebaseapp.com",
-    projectId: "badam-blog",
-    storageBucket: "badam-blog.appspot.com",
-    messagingSenderId: "778992495626",
-    appId: "1:778992495626:web:caa2d170c3cfbf7fe083f3",
-    measurementId: "G-342JW4TBYY"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
@@ -25,4 +24,4 @@ const signOut = () => {
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export { auth, provider, githubProvider,signOut,db ,storage};
+export { auth, provider, githubProvider, signOut, db, storage };
