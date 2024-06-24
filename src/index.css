@@ -1,13 +1,59 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  scrollbar-width: none;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.nav-link {
+  @apply text-white hover:text-gray-300 transition duration-300;
 }
+
+.glass-btn {
+  @apply bg-white bg-opacity-20 rounded-lg px-4 py-2 hover:bg-opacity-30 transition duration-300;
+}
+
+.shadow-glassmorphism {
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-inner-glassmorphism {
+  box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.text-gradient-pink-purple {
+  background: linear-gradient(to right, #ff6ec4, #7873f5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.neumorphic-circle {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.glass-textarea {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+  resize: none;
+  min-height: 100px;
+}
+
+
