@@ -13,7 +13,7 @@ const BlogDetail = () => {
     const [hasLiked, setHasLiked] = useState(false);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
-    const [userEmail, setUserEmail] = useState(auth.currentUser?.email || '');
+    const userEmail = auth.currentUser?.email || '';
 
     useEffect(() => {
         const fetchBlog = async () => {
