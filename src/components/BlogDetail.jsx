@@ -113,6 +113,7 @@ const BlogDetail = () => {
                             <ReactMarkdown>{blog.content}</ReactMarkdown>
                         </div>
                         <div className="flex justify-between items-center mt-4">
+                            <button onClick={handleLike} className={`glass-btn text-center text-white ${hasLiked ? 'opacity-50 cursor-not-allowed' : ''}`}>Like ({likes.length})</button>
                             <button onClick={handleShare} className="glass-btn text-center text-white">Share</button>
                         </div>
                         <div className="mt-8">
