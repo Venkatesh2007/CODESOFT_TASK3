@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { doc, getDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import ReactMarkdown from 'react-markdown';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 
 const BlogDetail = () => {
     const { id } = useParams();
@@ -47,6 +47,11 @@ const BlogDetail = () => {
     }, [id]);
 
     const handleLike = async () => {
+        if (!auth.currentUser) {
+            alert('Please log in to like the blog.');
+            return;
+        }
+
         const blogRef = doc(db, 'blogs', id);
         let updatedLikes;
 
@@ -61,8 +66,40 @@ const BlogDetail = () => {
         await updateDoc(blogRef, { likes: updatedLikes });
     };
 
+    const handleCommentLike = async (commentId) => {
+        if (!auth.currentUser) {
+            alert('Please log in to like the comment.');
+            return;
+        }
+
+        const commentRef = doc(db, 'blogs', id, 'comments', commentId);
+        const commentSnap = await getDoc(commentRef);
+        if (commentSnap.exists()) {
+            const commentData = commentSnap.data();
+            const likesArray = Array.isArray(commentData.likes) ? commentData.likes : [];
+            const hasLikedComment = likesArray.includes(auth.currentUser?.uid);
+
+        let updatedLikes;
+            if (hasLikedComment) {
+                updatedLikes = likesArray.filter(userId => userId !== auth.currentUser?.uid);
+            } else {
+                updatedLikes = [...likesArray, auth.currentUser?.uid];
+            }
+
+            await updateDoc(commentRef, { likes: updatedLikes });
+            setComments(comments.map(comment => 
+                comment.id === commentId ? { ...comment, likes: updatedLikes } : comment
+            ));
+        }
+    };
+
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
+        if (!auth.currentUser) {
+            alert('Please log in to post a comment.');
+            return;
+        }
+
         if (newComment.trim() === '') return;
 
         const commentData = {
@@ -70,6 +107,7 @@ const BlogDetail = () => {
             userEmail,
             userId: auth.currentUser?.uid,
             timestamp: new Date(),
+            likes: []
         };
 
         const commentsRef = collection(db, 'blogs', id, 'comments');
@@ -113,29 +151,48 @@ const BlogDetail = () => {
                             <ReactMarkdown>{blog.content}</ReactMarkdown>
                         </div>
                         <div className="flex justify-between items-center mt-4">
-                            <button onClick={handleLike} className={`glass-btn text-center text-white ${hasLiked ? 'opacity-50 cursor-not-allowed' : ''}`}>Like ({likes.length})</button>
+                            <button onClick={handleLike} className={`glass-btn text-center text-white ${hasLiked ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                <FaThumbsUp color={hasLiked ? 'blue' : 'white'} /> Like ({likes.length})
+                            </button>
                             <button onClick={handleShare} className="glass-btn text-center text-white">Share</button>
                         </div>
                         <div className="mt-8">
                             <h2 className="text-2xl text-white font-bold mb-4">Comments</h2>
-                            <form onSubmit={handleCommentSubmit} className="mb-4">
-                                <textarea
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded mt-1 bg-white bg-opacity-20 backdrop-blur-md text-white placeholder-gray-300 resize-none"
-                                    style={{ minHeight: '100px' }}
-                                    placeholder="Add your comment..."
-                                ></textarea>
-                                <button type="submit" className="glass-btn text-white mt-2">Post Comment</button>
-                            </form>
+                            {auth.currentUser ? (
+                                <form onSubmit={handleCommentSubmit} className="mb-4">
+                                    <textarea
+                                        value={newComment}
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        className="w-full p-2 border border-gray-300 rounded mt-1 bg-white bg-opacity-20 backdrop-blur-md text-white placeholder-gray-300 resize-none"
+                                        style={{ minHeight: '100px' }}
+                                        placeholder="Add your comment..."
+                                    ></textarea>
+                                    <button type="submit" className="glass-btn text-white mt-2">Post Comment</button>
+                                </form>
+                            ) : (
+                                <p className="text-white">Please log in to post a comment.</p>
+                            )}
                             <div className="space-y-4">
                                 {comments.map(comment => (
                                     <div key={comment.id} className="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
                                         <p className="text-white">{comment.content}</p>
-                                        <span className="text-gray-400">By {comment.userEmail}</span>
-                                        {comment.userId === auth.currentUser?.uid && (
-                                            <button onClick={() => handleDeleteComment(comment.id)} className="text-red-700 font-extrabold "><FaTrash/></button>
-                                        )}
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-400">By {comment.userEmail}</span>
+                                            <div className="flex items-center">
+                                                <button 
+                                                    onClick={() => handleCommentLike(comment.id)} 
+                                                    className="flex items-center text-white mr-2"
+                                                >
+                                                    <FaThumbsUp color={comment.likes.includes(auth.currentUser?.uid) ? 'blue' : 'white'} /> 
+                                                    {comment.likes.length}
+                                                </button>
+                                                {comment.userId === auth.currentUser?.uid && (
+                                                    <button onClick={() => handleDeleteComment(comment.id)} className="text-red-700 font-extrabold">
+                                                        <FaTrash />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
